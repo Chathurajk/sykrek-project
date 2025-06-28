@@ -1,10 +1,12 @@
 import express from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
-import Student from "./models/student.js";
-import studentRouter from "./routers/studentRouter.js";
-import usertRouter from "./routers/userRouter.js";
 import jwt from "jsonwebtoken"
+import userRouter from "./routers/userRouter.js";
+import productRouter from "./routers/productRouter.js";
+import dotenv from "dotenv"
+dotenv.config()
+
 
 
 const app = express();
@@ -17,7 +19,7 @@ app.use(
         if(value != null){
             const token = value.replace("Bearer ","")
             jwt.verify(token,
-                "cbc-6503",
+                process.env.JWT_SECRET,
                 (err,decoded)=>{
                     if(decoded == null){
                         res.status(403).json({
@@ -42,7 +44,7 @@ app.use(
 
 
 
-let connectionString = "mongodb+srv://admin:123@cluster0.x1i3dlj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+const connectionString = process.env.MONGO_URI
 mongoose.connect(connectionString).then(
     ()=>{
         console.log("Database connected")
@@ -53,8 +55,9 @@ mongoose.connect(connectionString).then(
     }
 )
 
-app.use("/student",studentRouter)
-app.use("/users",usertRouter)
+
+app.use("/users",userRouter)
+app.use("/products",productRouter)
 
 
 
